@@ -33,9 +33,9 @@ class LeftOrRightHandRule:
             linear_x_factor = 1                                # Full speed ahead
             self.decision = 'Full speed ahead'
 
-        self.pirnt_status()
+        self.print_status()
         return linear_x_factor, angular_z
     
-    def print_status():
+    def print_status(self):
         print ("Decision: ")
         print (self.decision)
