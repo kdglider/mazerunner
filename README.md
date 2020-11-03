@@ -1,4 +1,9 @@
-# Turtlebot Maze Solving with ROS
+# Maze Runner Turtlebot Maze Solver
+This repository is not yet complete
+
+## Overview
+This code is adapted from this [repository](https://github.com/celisun/ROS_Turtlebot_Maze_Solving_task).
+
 Exemplary code **[Autonomous Robotics Lab](http://campusrover.org.s3-website-us-west-2.amazonaws.com)** 
 
 @ Celi Sun  @ Nov, 2017  @ Brandeis University
@@ -19,46 +24,32 @@ Oct/2017
 <img src="https://raw.githubusercontent.com/celisun/ROS_Turtlebot_Maze_Solving_task/master/pics/tb3-LABEL[1].png" width="180"> 
 
 
-****
-### Run solution on your own labtop
-#### Clone repository
-You can clone this resiporoty by git to your own workspace by:
-```
-$ cd ~/catkin_ws/src
-$ git clone https://github.com/campusrover/CourseExemplary_TurtlebotMazeSolving.git
-```
-Go back to catkin_ws and build the packages in the workspace by running catkin_make command:
-```
-$ cd ..
-$ catkin_make
-```
-#### Configure IP address of labtop & turtlebot for ROS
-To use ROS to control your turtlebot, you always need to set up the connection between the turtlebot and the roscore running on your laptop by configuring the IP address for each other. 
+## Personnel
+Hao Da (Kevin) Dong
+Krithika Govindaraj
+Praveen Kumar Menaka Sekar      
+Sarjana Oradiambalam Sachidanandam
 
-On terminal,
-```
-$ ifconfig
-```
-In pop-up window, find the IP address of your own labtop/turtlebot shown after the last 'inet addr'.
 
-Then, set up with the IP address you found
+## Install Dependencies
+This package requires Ubuntu 18.04 with Python ROS Melodic and Turtlebot3. Install Turtlebot3 dependencies using:
 ```
-$ gedit ~/.bashrc
+sudo apt-get install ros-melodic-joy ros-melodic-teleop-twist-joy ros-melodic-teleop-twist-keyboard ros-melodic-laser-proc ros-melodic-rgbd-launch ros-melodic-depthimage-to-laserscan ros-melodic-rosserial-arduino ros-melodic-rosserial-python ros-melodic-rosserial-server ros-melodic-rosserial-client ros-melodic-rosserial-msgs ros-melodic-amcl ros-melodic-map-server ros-melodic-move-base ros-melodic-urdf ros-melodic-xacro ros-melodic-compressed-image-transport ros-melodic-rqt-image-view ros-melodic-gmapping ros-melodic-navigation ros-melodic-interactive-markers
 ```
-In pop-up .bashrc file, change the address of ROS_MASTER_URI (where the ros core is) and ROS_HOSTNAME (where your labtop is, can be same as ros core), but remain the port number, in this example '11311', unchanged. For example, if your laptop IP address is 129.64.147.246, change the following as:
-```
-export ROS_MASTER_URI=http://129.64.147.246:11311
-export ROS_HOSTNAME=129.64.147.246
-```
-After, close the file and source the bash file by running:
-```
-$ source ~/.bashrc
-```
-Do the same on your turtlebot, however while the master IP ROS_MASTER_URI is still where the ros core is, ROS_HOSTNAME is the IP address of the turtlebot itself (can be checked out by `ifconfig`).
 
-#### Ready to run
-Put your turtlebot in the puzzle, launch your turlebot and run the solution:
+Next, install Turtlebot3 with:
 ```
-rosrun CourseExemplary_TurtlebotMazeSolving main
+sudo apt-get install ros-melodic-turtlebot3-*
 ```
-Now watch how the turtlebot solves the maze !
+
+
+## Build Instructions
+This repository is a ROS package. Ensure that your current directory is the src folder inside your catkin workspace, then execute the following (assuming [Catkin Command Line Tools](https://catkin-tools.readthedocs.io/en/latest/) is used):
+```
+git clone https://github.com/kdglider/mazerunner.git
+catkin build
+```
+
+
+## Run Demonstration
+

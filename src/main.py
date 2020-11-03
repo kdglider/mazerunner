@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-# TurtleBot Maze Solving
+# Required for ROS to execute file as a Python script
+
+import sys
+sys.dont_write_bytecode = True
 
 import rospy
 
