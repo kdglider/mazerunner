@@ -6,7 +6,7 @@ import math
 
 class LeftOrRightHandRule:
 
-    def __init__(self, type, turn_speed= -2.0):
+    def __init__(self, type, turn_speed=-2.0):
 
         self.type = type
         self.direction = 1 if type=='LHR' else -1

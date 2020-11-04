@@ -14,18 +14,23 @@ class ScanTwistCenterControlNode:
     def __init__(self, scan_topic, pub_topic, policy='LHR', helper_controller=None, **kwargs):
 
         ##! Policy feed-in must be policy known by the center control
-        if policy not in ['LHR', 'RHR']:
+        if (policy not in ['LHR', 'RHR']):
             raise ValueError('Policy Supported: \'LHR\', \'RHR\'')
 
         self.direction = 1 if policy == 'LHR' else -1           # direction 1 for left hand rule, -1 for right hand rule
 
         self.scan_topic_name = scan_topic
         self.pub_topic_name = pub_topic
-        self.dis_to_wall_desired = kwargs['distance_to_wall_desired'] if 'distance_to_wall_desired' in kwargs else 0.  # Desired distance to the wall. default 0
+        
+        if ('distance_to_wall_desired' in kwargs):
+            self.dis_to_wall_desired = kwargs['distance_to_wall_desired']
+        else:
+            self.dis_to_wall_desired = 0
+
         self.max_speed = kwargs['max_speed'] if 'max_speed' in kwargs else 0.  # up-limit of robot speed. default 0
 
         ##/:: Register policy
-        if policy in ['LHR', 'RHR']:
+        if (policy in ['LHR', 'RHR']):
             self.policy = LeftOrRightHandRule(type=policy)
 
         ##/:: Register helper controller for robot movement

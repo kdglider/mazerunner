@@ -1,4 +1,4 @@
-# Maze Runner Turtlebot Maze Solver
+# Maze Runner: Turtlebot Maze Solver
 This repository is not yet complete
 
 ## Overview
@@ -26,8 +26,11 @@ Oct/2017
 
 ## Personnel
 Hao Da (Kevin) Dong
+
 Krithika Govindaraj
-Praveen Kumar Menaka Sekar      
+
+Praveen Kumar Menaka Sekar    
+
 Sarjana Oradiambalam Sachidanandam
 
 
