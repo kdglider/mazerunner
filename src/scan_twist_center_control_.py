@@ -3,6 +3,8 @@
 ##  @ Oct 2017, CS department Brandeis University                ##
 
 import rospy
+import time
+import numpy as np
 
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
@@ -69,6 +71,17 @@ class ScanTwistCenterControlNode:
         while not rospy.is_shutdown():  # running until being interrupted manually
             continue
         self.cmd_vel_pub(Twist())  # Stop robot and exist
+
+        # Start timer
+        self.start = time.perf_counter()
+
+
+    def end(self):
+        end = time.perf_counter()
+
+        runTime = end - self.start
+
+        rospy.signal_shutdown('Run Completed')
 
 
 

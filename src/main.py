@@ -11,7 +11,7 @@ from helper._pd_control import PDControlLoop
 
 
 # Initialize ROS node
-rospy.init_node('ros_maze_bot')
+rospy.init_node('ros_maze_bot', disable_signals=True)
 
 # Customize settings
 kwargs = {
