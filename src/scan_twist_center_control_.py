@@ -5,15 +5,33 @@
 import rospy
 import time
 import numpy as np
+import matplotlib.pyplot as plt
 
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
+from nav_msgs.msg import Odometry
 
 from policy._left_or_right_hand_rule import LeftOrRightHandRule
 
 
 class ScanTwistCenterControlNode:
-    def __init__(self, scan_topic, pub_topic, policy='LHR', helper_controller=None, **kwargs):
+    def __init__(self, endPoint, scan_topic, pub_topic, policy='LHR', helper_controller=None, **kwargs):
+        self.endPoint = endPoint
+        self.previousPoint = np.array([0,0])
+
+        self.navWPList = []
+
+        self.navDistance = 0
+
+        self.gtPathWPs = np.array([
+            [2.5, -2.5],
+            [0, -2.5],
+            [0, -1],
+            [1, -1],
+            [1, 1.3],
+            [0, 1.3],
+            [0, 2.4],
+            [2.5, 2.4]])
 
         ##! Policy feed-in must be policy known by the center control
         if (policy not in ['LHR', 'RHR']):
@@ -59,6 +77,7 @@ class ScanTwistCenterControlNode:
 
 
     def start(self):
+        odom_sub = rospy.Subscriber('/odom', Odometry, self.odomCB)
 
         ##/:: Register sensor data subscriber
         self.scan_sub = rospy.Subscriber(self.scan_topic_name, LaserScan, self._call_back)
@@ -68,20 +87,52 @@ class ScanTwistCenterControlNode:
 
         self.twist = Twist()
 
+        # Start timer
+        self.start = time.time()
+
         while not rospy.is_shutdown():  # running until being interrupted manually
             continue
-        self.cmd_vel_pub(Twist())  # Stop robot and exist
 
-        # Start timer
-        self.start = time.perf_counter()
+        navWPs = np.array(self.navWPList)
+        plt.plot(navWPs[:,0], navWPs[:,1], 'r-')
+        plt.plot(self.gtPathWPs[:,0], self.gtPathWPs[:,1], 'b-')
+        plt.show()
 
 
     def end(self):
-        end = time.perf_counter()
-
+        end = time.time()
         runTime = end - self.start
 
+        print('Navigation Time (s): ', runTime)
+        print('Navigation Distance (m): ', self.navDistance)
+        
+        self.twist.linear.x = 0      
+        self.twist.angular.z = 0
+        self.cmd_vel_pub.publish(self.twist)
+
         rospy.signal_shutdown('Run Completed')
+
+        
+        
+
+
+    def odomCB(self, poseMsg):
+        x = poseMsg.pose.pose.position.x
+        y = poseMsg.pose.pose.position.y
+
+        currentPoint = np.array([x, y])
+
+        try:
+            dist = np.linalg.norm(currentPoint - self.previousPoint)
+            self.navDistance += dist
+        except:
+            pass
+        
+        self.navWPList.append(currentPoint)
+        self.previousPoint = currentPoint
+
+        if (np.linalg.norm(currentPoint - self.endPoint) < 0.8):
+            self.end()
 
 
 
