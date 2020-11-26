@@ -66,6 +66,11 @@ scan_monitor = ScanTwistCenterControlNode(
 
 
 if __name__ == "__main__":
-    scan_monitor.start()
+    #scan_monitor.start()
+
+    if len(sys.argv) < 1:
+        print("Not enough arguments")
+    else:
+        print(sys.argv[1])
 
 
