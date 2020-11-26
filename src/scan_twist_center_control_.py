@@ -15,7 +15,7 @@ from policy._left_or_right_hand_rule import LeftOrRightHandRule
 
 
 class ScanTwistCenterControlNode:
-    def __init__(self, endPoint, scan_topic, pub_topic, policy='LHR', helper_controller=None, **kwargs):
+    def __init__(self, endPoint, gtPathWPs, scan_topic, pub_topic, policy='LHR', helper_controller=None, **kwargs):
         self.endPoint = endPoint
         self.previousPoint = np.array([0,0])
 
@@ -23,15 +23,9 @@ class ScanTwistCenterControlNode:
 
         self.navDistance = 0
 
-        self.gtPathWPs = np.array([
-            [2.5, -2.5],
-            [0, -2.5],
-            [0, -1],
-            [1, -1],
-            [1, 1.3],
-            [0, 1.3],
-            [0, 2.4],
-            [2.5, 2.4]])
+        self.locomotionErrorList = []
+
+        self.gtPathWPs = gtPathWPs
 
         ##! Policy feed-in must be policy known by the center control
         if (policy not in ['LHR', 'RHR']):
@@ -103,8 +97,11 @@ class ScanTwistCenterControlNode:
         end = time.time()
         runTime = end - self.start
 
+        meanLocomotionError = sum(self.locomotionErrorList) / len(self.locomotionErrorList)
+
         print('Navigation Time (s): ', runTime)
         print('Navigation Distance (m): ', self.navDistance)
+        print('Mean Locomotion Error (m): ', meanLocomotionError)
         
         self.twist.linear.x = 0      
         self.twist.angular.z = 0
@@ -113,9 +110,6 @@ class ScanTwistCenterControlNode:
         rospy.signal_shutdown('Run Completed')
 
         
-        
-
-
     def odomCB(self, poseMsg):
         x = poseMsg.pose.pose.position.x
         y = poseMsg.pose.pose.position.y
@@ -131,7 +125,19 @@ class ScanTwistCenterControlNode:
         self.navWPList.append(currentPoint)
         self.previousPoint = currentPoint
 
-        if (np.linalg.norm(currentPoint - self.endPoint) < 0.8):
+        minError = 10
+
+        for i in range(len(self.gtPathWPs)-1):
+            error = np.linalg.norm(
+                np.cross(self.gtPathWPs[i+1]-self.gtPathWPs[i], self.gtPathWPs[i]-currentPoint)) \
+                / np.linalg.norm(self.gtPathWPs[i+1]-self.gtPathWPs[i])
+
+            if (error < minError):
+                minError = error
+
+        self.locomotionErrorList.append(minError)
+
+        if (np.linalg.norm(currentPoint - self.endPoint) < 0.6):
             self.end()
 
 
