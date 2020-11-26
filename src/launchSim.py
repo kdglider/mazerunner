@@ -57,7 +57,27 @@ roslaunch_parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
 
 roslaunch_parent.start()
 
-rospy.sleep(10)
+
+
+
+#test = rospy.get_param('test')
+#print(test)
+
+package = 'mazerunner'
+executable = 'main.py'
+node = roslaunch.core.Node(package, executable, args='42')
+
+launch = roslaunch.scriptapi.ROSLaunch()
+launch.start()
+print('BREAK1')
+process = launch.launch(node)
+rospy.sleep(5)
+print('BREAK3')
+print(process.is_alive())
+process.stop()
+
+
+rospy.sleep(15)
 roslaunch_parent.shutdown()
 
 '''

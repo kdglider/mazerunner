@@ -63,14 +63,18 @@ scan_monitor = ScanTwistCenterControlNode(
     policy='LHR', 
     helper_controller=PDControlLoop, **kwargs)
 
-
+print('BREAK1.5')
 
 if __name__ == "__main__":
-    #scan_monitor.start()
-
-    if len(sys.argv) < 1:
+    print('BREAK2')
+    print(len(sys.argv))
+    if len(sys.argv) < 2:
         print("Not enough arguments")
     else:
         print(sys.argv[1])
+    #test = rospy.get_param('test')
+    #print(test)
+    scan_monitor.start()
+
 
 
