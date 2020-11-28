@@ -96,15 +96,29 @@ class ScanTwistCenterControlNode:
         rospy.set_param('simComplete', True)
 
 
-    def end(self):
-        end = time.time()
-        runTime = end - self.start
+    def end(self, successFlag):
+        if (successFlag == True):
+            end = time.time()
+            runTime = end - self.start
 
-        meanLocomotionError = sum(self.locomotionErrorList) / len(self.locomotionErrorList)
+            meanLocomotionError = sum(self.locomotionErrorList) / len(self.locomotionErrorList)
 
-        print('Navigation Time (s): ', runTime)
-        print('Navigation Distance (m): ', self.navDistance)
-        print('Mean Locomotion Error (m): ', meanLocomotionError)
+            print('Navigation Time (s): ', runTime)
+            print('Navigation Distance (m): ', self.navDistance)
+            print('Mean Locomotion Error (m): ', meanLocomotionError)
+
+            rospy.set_param('runTime', float(runTime))
+            rospy.set_param('navDistance', float(self.navDistance))
+            rospy.set_param('meanLocomotionError', float(meanLocomotionError))
+        
+        else:
+            print('Navigation Time (s): ', 'FAILED')
+            print('Navigation Distance (m): ', 'FAILED')
+            print('Mean Locomotion Error (m): ', 'FAILED')
+
+            rospy.set_param('runTime', 'FAILED')
+            rospy.set_param('navDistance', 'FAILED')
+            rospy.set_param('meanLocomotionError', 'FAILED')
         
         self.twist.linear.x = 0      
         self.twist.angular.z = 0
@@ -141,8 +155,10 @@ class ScanTwistCenterControlNode:
         self.locomotionErrorList.append(minError)
 
         if (np.linalg.norm(currentPoint - self.endPoint) < 0.6):
-            self.end()
+            self.end(True)
 
+        if (time.time() - self.start > 420):
+            self.end(False)
 
 
     ## Message raw data processing,
