@@ -4,6 +4,8 @@
 import rospy
 import roslaunch
 import numpy as np
+import random
+import math
 
 
 # Deterministic mode start/end points
@@ -52,6 +54,8 @@ maze1StartEndCombos = np.array([[maze1StartPoints[2], maze1EndPoints[2]]])
 maze2StartEndCombos = np.array([[maze2StartPoints[2], maze2EndPoints[2]]])
 maze3StartEndCombos = np.array([[maze3StartPoints[2], maze3EndPoints[2]]])
 
+# Number of runs per maze in stochastic mode
+runsPerMaze = 2
 
 # Prompt user for mode selection
 mode = raw_input('Enter "d" for Deterministic mode or "s" for Stochastic mode: ')
@@ -104,7 +108,7 @@ if (mode == 'd'):
 
         roslaunch_parent.shutdown()
 
-        rospy.sleep(10)
+        rospy.sleep(5)
     
     for combo in maze2StartEndCombos:
         totalSims += 1
@@ -146,7 +150,7 @@ if (mode == 'd'):
 
         roslaunch_parent.shutdown()
 
-        rospy.sleep(10)
+        rospy.sleep(5)
     
     for combo in maze3StartEndCombos:
         totalSims += 1
@@ -187,18 +191,198 @@ if (mode == 'd'):
             
         roslaunch_parent.shutdown()
 
-        rospy.sleep(10)
+        rospy.sleep(5)
 
-    successRate = float(successSims) / totalSims
-    print('Success Rate: ', successRate)
+    print('Success Rate: ', float(successSims) / totalSims)
 
 
 elif (mode == 's'):
-    runTime = rospy.get_param('runTime')
-    navDistance = rospy.get_param('navDistance')
-    meanLocomotionError = rospy.get_param('meanLocomotionError')
+    totalSims = 0
+    successSims = 0
 
+    runTimeList = []
+    navDistanceList = []
+    locomotionErrorList = []
+    for i in range(runsPerMaze):
+        totalSims += 1
 
+        # Generate random start and end points along the x-axis
+        startPointX = random.uniform(maze1StartPoints[0][0], maze1StartPoints[2][0])
+        endPointX = random.uniform(maze1EndPoints[0][0], maze1EndPoints[2][0])
 
+        startPoint = np.array([startPointX, maze1StartPoints[0][1]])
+        endPoint = np.array([endPointX, maze1EndPoints[0][1]])
+
+        # Generate random orientation
+        yaw = random.uniform(0, 2*math.pi)
+
+        rospy.set_param('endPoint', endPoint.tolist())
+
+        # Set full ground truth path
+        #gtPathWPs = np.concatenate((np.concatenate((startPoint, maze3gtPathWPs), axis=0), endPoint), axis=0)
+        gtPathWPs = np.insert(maze1gtPathWPs, 0, startPoint, axis=0)
+        gtPathWPs = np.insert(gtPathWPs, len(gtPathWPs), endPoint, axis=0)
+        rospy.set_param('gtPathWPs', gtPathWPs.tolist())
+
+        x_pos_arg = 'x_pos:=' + str(startPoint[0])
+        y_pos_arg = 'y_pos:=' + str(startPoint[1])
+        yaw_arg = 'yaw:=' + str(yaw)
+        cli_args = ['/home/kevin/Workspaces/ENSE623/src/mazerunner/launch/maze1.launch', x_pos_arg, y_pos_arg, yaw_arg]
+        
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        roslaunch_parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+
+        roslaunch_parent.start()
+
+        # Do not terminate launch parent if simulation is not complete
+        rospy.sleep(5)
+        simComplete = rospy.get_param('simComplete')
+        while (simComplete == False):
+            simComplete = rospy.get_param('simComplete')
+            continue
+        
+        runTime = rospy.get_param('runTime')
+        if (runTime != 'FAILED'):
+            successSims += 1
+            runTimeList.append(rospy.get_param('runTime'))
+            navDistanceList.append(rospy.get_param('navDistance'))
+            locomotionErrorList.append(rospy.get_param('meanLocomotionError'))
+
+        roslaunch_parent.shutdown()
+
+        rospy.sleep(5)
+
+    if (len(runTimeList) != 0):
+        print('Maze 1 Mean Navigation Time (s): ', sum(runTimeList)/len(runTimeList))
+        print('Maze 1 Mean Navigation Distance (m): ', sum(navDistanceList)/len(navDistanceList))
+        print('Maze 1 Mean Locomotion Error (m): ', sum(locomotionErrorList)/len(locomotionErrorList))
+    else:
+        print('All runs failed for this maze')
+
+    runTimeList = []
+    navDistanceList = []
+    locomotionErrorList = []
+    for i in range(runsPerMaze):
+        totalSims += 1
+
+        # Generate random start and end points along the x-axis
+        startPointX = random.uniform(maze2StartPoints[0][0], maze2StartPoints[2][0])
+        endPointX = random.uniform(maze2EndPoints[0][0], maze2EndPoints[2][0])
+
+        startPoint = np.array([startPointX, maze2StartPoints[0][1]])
+        endPoint = np.array([endPointX, maze2EndPoints[0][1]])
+
+        # Generate random orientation
+        yaw = random.uniform(0, 2*math.pi)
+
+        rospy.set_param('endPoint', endPoint.tolist())
+
+        # Set full ground truth path
+        #gtPathWPs = np.concatenate((np.concatenate((startPoint, maze3gtPathWPs), axis=0), endPoint), axis=0)
+        gtPathWPs = np.insert(maze1gtPathWPs, 0, startPoint, axis=0)
+        gtPathWPs = np.insert(gtPathWPs, len(gtPathWPs), endPoint, axis=0)
+        rospy.set_param('gtPathWPs', gtPathWPs.tolist())
+
+        x_pos_arg = 'x_pos:=' + str(startPoint[0])
+        y_pos_arg = 'y_pos:=' + str(startPoint[1])
+        yaw_arg = 'yaw:=' + str(yaw)
+        cli_args = ['/home/kevin/Workspaces/ENSE623/src/mazerunner/launch/maze2.launch', x_pos_arg, y_pos_arg, yaw_arg]
+        
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        roslaunch_parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+
+        roslaunch_parent.start()
+
+        # Do not terminate launch parent if simulation is not complete
+        rospy.sleep(5)
+        simComplete = rospy.get_param('simComplete')
+        while (simComplete == False):
+            simComplete = rospy.get_param('simComplete')
+            continue
+        
+        runTime = rospy.get_param('runTime')
+        if (runTime != 'FAILED'):
+            successSims += 1
+            runTimeList.append(rospy.get_param('runTime'))
+            navDistanceList.append(rospy.get_param('navDistance'))
+            locomotionErrorList.append(rospy.get_param('meanLocomotionError'))
+
+        roslaunch_parent.shutdown()
+
+        rospy.sleep(5)
+
+    if (len(runTimeList) != 0):
+        print('Maze 2 Mean Navigation Time (s): ', sum(runTimeList)/len(runTimeList))
+        print('Maze 2 Mean Navigation Distance (m): ', sum(navDistanceList)/len(navDistanceList))
+        print('Maze 2 Mean Locomotion Error (m): ', sum(locomotionErrorList)/len(locomotionErrorList))
+    else:
+        print('All runs failed for this maze')
+
+    runTimeList = []
+    navDistanceList = []
+    locomotionErrorList = []
+    for i in range(runsPerMaze):
+        totalSims += 1
+
+        # Generate random start and end points along the x-axis
+        startPointX = random.uniform(maze3StartPoints[0][0], maze3StartPoints[2][0])
+        endPointX = random.uniform(maze3EndPoints[0][0], maze3EndPoints[2][0])
+
+        startPoint = np.array([startPointX, maze3StartPoints[0][1]])
+        endPoint = np.array([endPointX, maze3EndPoints[0][1]])
+
+        # Generate random orientation
+        yaw = random.uniform(0, 2*math.pi)
+
+        rospy.set_param('endPoint', endPoint.tolist())
+
+        # Set full ground truth path
+        #gtPathWPs = np.concatenate((np.concatenate((startPoint, maze3gtPathWPs), axis=0), endPoint), axis=0)
+        gtPathWPs = np.insert(maze1gtPathWPs, 0, startPoint, axis=0)
+        gtPathWPs = np.insert(gtPathWPs, len(gtPathWPs), endPoint, axis=0)
+        rospy.set_param('gtPathWPs', gtPathWPs.tolist())
+
+        x_pos_arg = 'x_pos:=' + str(startPoint[0])
+        y_pos_arg = 'y_pos:=' + str(startPoint[1])
+        yaw_arg = 'yaw:=' + str(yaw)
+        cli_args = ['/home/kevin/Workspaces/ENSE623/src/mazerunner/launch/maze3.launch', x_pos_arg, y_pos_arg, yaw_arg]
+        
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        roslaunch_parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+
+        roslaunch_parent.start()
+
+        # Do not terminate launch parent if simulation is not complete
+        rospy.sleep(5)
+        simComplete = rospy.get_param('simComplete')
+        while (simComplete == False):
+            simComplete = rospy.get_param('simComplete')
+            continue
+        
+        runTime = rospy.get_param('runTime')
+        if (runTime != 'FAILED'):
+            successSims += 1
+            runTimeList.append(rospy.get_param('runTime'))
+            navDistanceList.append(rospy.get_param('navDistance'))
+            locomotionErrorList.append(rospy.get_param('meanLocomotionError'))
+
+        roslaunch_parent.shutdown()
+
+        rospy.sleep(5)
+
+    if (len(runTimeList) != 0):
+        print('Maze 3 Mean Navigation Time (s): ', sum(runTimeList)/len(runTimeList))
+        print('Maze 3 Mean Navigation Distance (m): ', sum(navDistanceList)/len(navDistanceList))
+        print('Maze 3 Mean Locomotion Error (m): ', sum(locomotionErrorList)/len(locomotionErrorList))
+    else:
+        print('All runs failed for this maze')
+
+    print('Success Rate: ', float(successSims) / totalSims)
 
 
