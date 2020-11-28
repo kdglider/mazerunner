@@ -92,6 +92,9 @@ class ScanTwistCenterControlNode:
         plt.plot(self.gtPathWPs[:,0], self.gtPathWPs[:,1], 'b-')
         plt.show()
 
+        # Signal that the simulation is complete
+        rospy.set_param('simComplete', True)
+
 
     def end(self):
         end = time.time()
@@ -199,9 +202,9 @@ class ScanTwistCenterControlNode:
 
         self.cmd_vel_pub.publish(self.twist)        # Action
 
-        print("Execute: ")
-        print(self.twist)
-        print("- - - - - - - - - -   ")
+        #print("Execute: ")
+        #print(self.twist)
+        #print("- - - - - - - - - -   ")
 
 
 

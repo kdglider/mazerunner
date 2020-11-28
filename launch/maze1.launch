@@ -1,13 +1,11 @@
 <launch>
     <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
-    <arg name="x_pos" default="2.5"/>
-    <arg name="y_pos" default="-2.5"/>
+    <arg name="x_pos" default="0"/>
+    <arg name="y_pos" default="0"/>
     <arg name="z_pos" default="0.0"/>
     <arg name="roll" default="0.0"/>
     <arg name="pitch" default="0.0"/>
     <arg name="yaw" default="1.570796327"/>
-
-    <arg name="test" default="0"/>
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(find mazerunner)/world/maze1.world"/>
@@ -30,8 +28,7 @@
                 -Y $(arg yaw) 
                 -param robot_description" />
     
-    <!--
-    <node name="ros_maze_bot" pkg="mazerunner" type="main.py" 
-        args="-test $(arg test) " />-->
+
+    <node name="ros_maze_bot" pkg="mazerunner" type="main.py" output="screen" />
     
 </launch>
