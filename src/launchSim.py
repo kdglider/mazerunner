@@ -50,12 +50,14 @@ maze3gtPathWPs = np.array([
 
 
 # Deterministic mode start/end point test case combinations
-maze1StartEndCombos = np.array([[maze1StartPoints[2], maze1EndPoints[2]]])
+#maze1StartEndCombos = np.array([[maze1StartPoints[2], maze1EndPoints[2]]])
 maze2StartEndCombos = np.array([[maze2StartPoints[2], maze2EndPoints[2]]])
-maze3StartEndCombos = np.array([[maze3StartPoints[2], maze3EndPoints[2]]])
+#maze3StartEndCombos = np.array([[maze3StartPoints[2], maze3EndPoints[2]]])
+maze1StartEndCombos = np.array([])
+maze3StartEndCombos = np.array([])
 
 # Number of runs per maze in stochastic mode
-runsPerMaze = 2
+runsPerMaze = 3
 
 # Prompt user for mode selection
 mode = raw_input('Enter "d" for Deterministic mode or "s" for Stochastic mode: ')
@@ -203,6 +205,8 @@ elif (mode == 's'):
     runTimeList = []
     navDistanceList = []
     locomotionErrorList = []
+    startXValues = []
+    endXValues = []
     for i in range(runsPerMaze):
         totalSims += 1
 
@@ -212,6 +216,9 @@ elif (mode == 's'):
 
         startPoint = np.array([startPointX, maze1StartPoints[0][1]])
         endPoint = np.array([endPointX, maze1EndPoints[0][1]])
+
+        startXValues.append(startPointX)
+        endXValues.append(endPointX)
 
         # Generate random orientation
         yaw = random.uniform(0, 2*math.pi)
@@ -255,15 +262,23 @@ elif (mode == 's'):
         rospy.sleep(5)
 
     if (len(runTimeList) != 0):
-        print('Maze 1 Mean Navigation Time (s): ', sum(runTimeList)/len(runTimeList))
-        print('Maze 1 Mean Navigation Distance (m): ', sum(navDistanceList)/len(navDistanceList))
-        print('Maze 1 Mean Locomotion Error (m): ', sum(locomotionErrorList)/len(locomotionErrorList))
+        runTimeArray = np.array(runTimeList)
+        navDistanceArray = np.array(navDistanceList)
+        locomotionErrorArray = np.array(locomotionErrorList)
+        print('Maze 1 Mean Navigation Time (s): ', np.average(runTimeArray))
+        print('Maze 1 Navigation Time Standard Deviation: ', np.std(runTimeArray))
+        print('Maze 1 Mean Navigation Distance (m): ', np.average(navDistanceArray))
+        print('Maze 1 Navigation Distance Standard Deviation: ', np.std(navDistanceArray))
+        print('Maze 1 Mean Locomotion Error (m): ', np.average(locomotionErrorArray))
+        print('Maze 1 Locomotion Error Standard Deviation: ', np.std(locomotionErrorArray))
     else:
         print('All runs failed for this maze')
 
     runTimeList = []
     navDistanceList = []
     locomotionErrorList = []
+    startXValues = []
+    endXValues = []
     for i in range(runsPerMaze):
         totalSims += 1
 
@@ -273,6 +288,9 @@ elif (mode == 's'):
 
         startPoint = np.array([startPointX, maze2StartPoints[0][1]])
         endPoint = np.array([endPointX, maze2EndPoints[0][1]])
+
+        startXValues.append(startPointX)
+        endXValues.append(endPointX)
 
         # Generate random orientation
         yaw = random.uniform(0, 2*math.pi)
@@ -325,6 +343,8 @@ elif (mode == 's'):
     runTimeList = []
     navDistanceList = []
     locomotionErrorList = []
+    startXValues = []
+    endXValues = []
     for i in range(runsPerMaze):
         totalSims += 1
 
@@ -334,6 +354,9 @@ elif (mode == 's'):
 
         startPoint = np.array([startPointX, maze3StartPoints[0][1]])
         endPoint = np.array([endPointX, maze3EndPoints[0][1]])
+
+        startXValues.append(startPointX)
+        endXValues.append(endPointX)
 
         # Generate random orientation
         yaw = random.uniform(0, 2*math.pi)

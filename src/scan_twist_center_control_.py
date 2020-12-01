@@ -48,8 +48,10 @@ class ScanTwistCenterControlNode:
             self.policy = LeftOrRightHandRule(type=policy)
 
         ##/:: Register helper controller for robot movement
-        if helper_controller:
+        if (helper_controller != None):
             self.helper_controller = helper_controller(direction=self.direction, distance_to_wall=self.dis_to_wall_desired)
+        else:
+            self.helper_controller = None
 
 
         self.min_distance = 0.0  # Distance closest to robot measured
@@ -191,11 +193,12 @@ class ScanTwistCenterControlNode:
         min_idx = ranges.index(min(half_ranges))  # Get index of direction with closest distance
 
         self.distance_front = ranges[size / 2]      # Get distance at front
+        #elf.distance_front = min(ranges[size / 2 - 30 : size / 2])
         self.min_distance = ranges[min_idx]         # Get closest distance
         self.angle_with_closet_obstacle = (min_idx - size / 2) * msg.angle_increment  # Calculate angle of closest distance
 
         ## Get feedback from helper controller if applicable
-        if self.helper_controller:
+        if (self.helper_controller != None):
             angular_z = self.helper_controller.step(self.min_distance, self.angle_with_closet_obstacle)
 
             self.twist.angular.z += angular_z

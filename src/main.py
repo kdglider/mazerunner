@@ -19,7 +19,7 @@ rospy.init_node('ros_maze_bot', disable_signals=True)
 
 # Customize settings
 kwargs = {
-    'distance_to_wall_desired': 0.25,
+    'distance_to_wall_desired': 0.26,
     'max_speed': 0.25,
 }
 
@@ -38,7 +38,8 @@ scan_monitor = ScanTwistCenterControlNode(
     scan_topic="/scan",
     pub_topic="cmd_vel",
     policy='LHR', 
-    helper_controller=PDControlLoop, **kwargs)
+    helper_controller=PDControlLoop, 
+    **kwargs)
 
 
 
