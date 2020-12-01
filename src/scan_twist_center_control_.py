@@ -48,8 +48,10 @@ class ScanTwistCenterControlNode:
             self.policy = LeftOrRightHandRule(type=policy)
 
         ##/:: Register helper controller for robot movement
-        if helper_controller:
+        if (helper_controller != None):
             self.helper_controller = helper_controller(direction=self.direction, distance_to_wall=self.dis_to_wall_desired)
+        else:
+            self.helper_controller = None
 
 
         self.min_distance = 0.0  # Distance closest to robot measured
@@ -92,16 +94,33 @@ class ScanTwistCenterControlNode:
         plt.plot(self.gtPathWPs[:,0], self.gtPathWPs[:,1], 'b-')
         plt.show()
 
+        # Signal that the simulation is complete
+        rospy.set_param('simComplete', True)
 
-    def end(self):
-        end = time.time()
-        runTime = end - self.start
 
-        meanLocomotionError = sum(self.locomotionErrorList) / len(self.locomotionErrorList)
+    def end(self, successFlag):
+        if (successFlag == True):
+            end = time.time()
+            runTime = end - self.start
 
-        print('Navigation Time (s): ', runTime)
-        print('Navigation Distance (m): ', self.navDistance)
-        print('Mean Locomotion Error (m): ', meanLocomotionError)
+            meanLocomotionError = sum(self.locomotionErrorList) / len(self.locomotionErrorList)
+
+            print('Navigation Time (s): ', runTime)
+            print('Navigation Distance (m): ', self.navDistance)
+            print('Mean Locomotion Error (m): ', meanLocomotionError)
+
+            rospy.set_param('runTime', float(runTime))
+            rospy.set_param('navDistance', float(self.navDistance))
+            rospy.set_param('meanLocomotionError', float(meanLocomotionError))
+        
+        else:
+            print('Navigation Time (s): ', 'FAILED')
+            print('Navigation Distance (m): ', 'FAILED')
+            print('Mean Locomotion Error (m): ', 'FAILED')
+
+            rospy.set_param('runTime', 'FAILED')
+            rospy.set_param('navDistance', 'FAILED')
+            rospy.set_param('meanLocomotionError', 'FAILED')
         
         self.twist.linear.x = 0      
         self.twist.angular.z = 0
@@ -138,8 +157,10 @@ class ScanTwistCenterControlNode:
         self.locomotionErrorList.append(minError)
 
         if (np.linalg.norm(currentPoint - self.endPoint) < 0.6):
-            self.end()
+            self.end(True)
 
+        if (time.time() - self.start > 420):
+            self.end(False)
 
 
     ## Message raw data processing,
@@ -172,11 +193,12 @@ class ScanTwistCenterControlNode:
         min_idx = ranges.index(min(half_ranges))  # Get index of direction with closest distance
 
         self.distance_front = ranges[size / 2]      # Get distance at front
+        #elf.distance_front = min(ranges[size / 2 - 30 : size / 2])
         self.min_distance = ranges[min_idx]         # Get closest distance
         self.angle_with_closet_obstacle = (min_idx - size / 2) * msg.angle_increment  # Calculate angle of closest distance
 
         ## Get feedback from helper controller if applicable
-        if self.helper_controller:
+        if (self.helper_controller != None):
             angular_z = self.helper_controller.step(self.min_distance, self.angle_with_closet_obstacle)
 
             self.twist.angular.z += angular_z
@@ -199,9 +221,9 @@ class ScanTwistCenterControlNode:
 
         self.cmd_vel_pub.publish(self.twist)        # Action
 
-        print("Execute: ")
-        print(self.twist)
-        print("- - - - - - - - - -   ")
+        #print("Execute: ")
+        #print(self.twist)
+        #print("- - - - - - - - - -   ")
 
 
 
