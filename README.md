@@ -1,27 +1,7 @@
 # Maze Runner: Turtlebot Maze Solver
-This repository is not yet complete
 
 ## Overview
-This code is adapted from this [repository](https://github.com/celisun/ROS_Turtlebot_Maze_Solving_task).
-
-Exemplary code **[Autonomous Robotics Lab](http://campusrover.org.s3-website-us-west-2.amazonaws.com)** 
-
-@ Celi Sun  @ Nov, 2017  @ Brandeis University
-
-To nagivate turtlebot solving a maze, we have: 
-
-- main
-- scan twist center control
-- policy
-- helper controller
-
-The scan twist center control is receiving messages, processing message raw data, and publishing reaction messages once activated. It is also registered with a policy and an optional helper controller to help it make decisions of what action to take in response to the incoming message it receives, and therefore, eventually, navigates a turtlebot out of maze.
-
-The repo here gives the exemplary code of solution and the default policy we provide is LeftOrRightHandRule, but you are more than welcomed to add your own policies (extends our Policy class). To add, put your policy script in the policy folder, and make the center control "know" it, and get it registered in the constructor to make it work.
- 
-Oct/2017
-
-<img src="https://raw.githubusercontent.com/celisun/ROS_Turtlebot_Maze_Solving_task/master/pics/tb3-LABEL[1].png" width="180"> 
+The Maze Runner is an autonomous, wheeled robotic system based on Turtlebot3 that aims to navigate a simply connected maze without a prior map given a start and end point. The Maze Runner uses inputs from wheel odometers and a 2D LiDAR for localization and mapping, and uses a wall following algorithm that is adapted from this [repository](https://github.com/celisun/ROS_Turtlebot_Maze_Solving_task). This repository provides the software for the robot itself as well as a simulation file that offers a user interface for both deterministic and stochastic modes of operation to evaluate certain metrics of interest to support the enhancement of system performance and decision making. 
 
 
 ## Personnel
@@ -47,7 +27,7 @@ sudo apt-get install ros-melodic-turtlebot3-*
 
 
 ## Build Instructions
-This repository is a ROS package. Ensure that your current directory is the src folder inside your catkin workspace, then execute the following (assuming [Catkin Command Line Tools](https://catkin-tools.readthedocs.io/en/latest/) is used):
+This repository is a ROS package. Thus, ensure that your current directory is the src folder inside your catkin workspace, then execute the following (assuming [Catkin Command Line Tools](https://catkin-tools.readthedocs.io/en/latest/) is used):
 ```
 git clone https://github.com/kdglider/mazerunner.git
 catkin build
@@ -55,4 +35,17 @@ catkin build
 
 
 ## Run Demonstration
+To examine the example maze world files, navigate to the world folder and use the gazebo command. For example:
+```
+gazebo maze1.world
+```
 
+To launch the simulation, open two terminal windows. In the first window, run:
+```
+roscore
+```
+In the second window, run:
+```
+rosrun mazerunner launchSim.py
+```
+The start/end locations of each maze for the deterministic mode and the number of runs per maze for the stochastic mode can be changed in the launchSim.py file. After the file is run, enter either "d" or "s" at the prompt to run the simulation in either deterministic or stochastic mode respectively. Multiple Gazebo windows will open and close as the difference test cases are run. Metrics of interest will be printed to the terminal as they become available.
