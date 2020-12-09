@@ -13,25 +13,25 @@ maze1StartPoints = [[-1.5, -2.5],
                     [0.5, -2.5],
                     [2.5, -2.5]]
 
-maze2StartPoints = [[-0.5, -4.5],
-                    [1, -4.5],
-                    [3, -4.5]]
+maze2StartPoints = [[-1, -3.25],
+                    [0.75, -3.25],
+                    [2.5, -3.25]]
 
-maze3StartPoints = [[-0.5, -3],
-                    [1.25, -3],
-                    [3.5, -3]]
+maze3StartPoints = [[-0.5, -2.8],
+                    [1.25, -2.8],
+                    [3.5, -2.8]]
 
 maze1EndPoints = [[-1.5, 2.4],
                   [0.5, 2.4],
                   [2.5, 2.4]]
 
-maze2EndPoints = [[-0.5, 0.5],
-                  [1, 0.5],
-                  [3, 0.5]]
+maze2EndPoints = [[-1, 1.5],
+                  [0.75, 1.5],
+                  [2.5, 1.5]]
 
-maze3EndPoints = [[-0.5, 2],
-                  [1.25, 2],
-                  [3.5, 2]]
+maze3EndPoints = [[-0.5, 1.75],
+                  [1.25, 1.75],
+                  [3.5, 1.75]]
 
 # Ground Truth Paths
 maze1gtPathWPs = np.array([
@@ -39,25 +39,36 @@ maze1gtPathWPs = np.array([
             [1, 1]])
 
 maze2gtPathWPs = np.array([
-            [1, -4],
-            [1, -1.5]])
+            [0.5, -3],
+            [0.5, 0]])
 
 maze3gtPathWPs = np.array([
-            [3, -2],
-            [3, -1],
-            [1.5, -1],
-            [1.5, 0.5],])
+            [1.25, -2],
+            [1.25, 0.5],])
 
 
 # Deterministic mode start/end point test case combinations
-#maze1StartEndCombos = np.array([[maze1StartPoints[2], maze1EndPoints[2]]])
-maze2StartEndCombos = np.array([[maze2StartPoints[2], maze2EndPoints[2]]])
-#maze3StartEndCombos = np.array([[maze3StartPoints[2], maze3EndPoints[2]]])
-maze1StartEndCombos = np.array([])
-maze3StartEndCombos = np.array([])
+maze1StartEndCombos = np.array([#[maze1StartPoints[2], maze1EndPoints[2]],
+                                #[maze1StartPoints[1], maze1EndPoints[0]],
+                                #[maze1StartPoints[1], maze1EndPoints[2]],
+                                #[maze1StartPoints[0], maze1EndPoints[1]],
+                                #[maze1StartPoints[2], maze1EndPoints[1]]
+                                ])
+maze2StartEndCombos = np.array([#[maze2StartPoints[2], maze2EndPoints[2]],
+                                #[maze2StartPoints[1], maze2EndPoints[0]],
+                                #[maze2StartPoints[1], maze2EndPoints[2]],
+                                #[maze2StartPoints[0], maze2EndPoints[1]],
+                                #[maze2StartPoints[2], maze2EndPoints[1]]
+                                ])
+maze3StartEndCombos = np.array([#[maze3StartPoints[2], maze3EndPoints[2]],
+                                #[maze3StartPoints[1], maze3EndPoints[0]],
+                                [maze3StartPoints[1], maze3EndPoints[2]],
+                                #[maze3StartPoints[0], maze3EndPoints[1]],
+                                #[maze3StartPoints[2], maze3EndPoints[1]]
+                                ])
 
 # Number of runs per maze in stochastic mode
-runsPerMaze = 3
+runsPerMaze = 2
 
 # Prompt user for mode selection
 mode = raw_input('Enter "d" for Deterministic mode or "s" for Stochastic mode: ')
@@ -201,7 +212,7 @@ if (mode == 'd'):
 elif (mode == 's'):
     totalSims = 0
     successSims = 0
-
+    '''
     runTimeList = []
     navDistanceList = []
     locomotionErrorList = []
@@ -265,15 +276,31 @@ elif (mode == 's'):
         runTimeArray = np.array(runTimeList)
         navDistanceArray = np.array(navDistanceList)
         locomotionErrorArray = np.array(locomotionErrorList)
-        print('Maze 1 Mean Navigation Time (s): ', np.average(runTimeArray))
-        print('Maze 1 Navigation Time Standard Deviation: ', np.std(runTimeArray))
-        print('Maze 1 Mean Navigation Distance (m): ', np.average(navDistanceArray))
-        print('Maze 1 Navigation Distance Standard Deviation: ', np.std(navDistanceArray))
-        print('Maze 1 Mean Locomotion Error (m): ', np.average(locomotionErrorArray))
-        print('Maze 1 Locomotion Error Standard Deviation: ', np.std(locomotionErrorArray))
+
+        print('Maze 1 Navigation Time (s)')
+        print('Mean: ', np.average(runTimeArray))
+        print('Standard Deviation: ', np.std(runTimeArray))
+        print('Max: ', max(runTimeArray))
+        print('Min: ', min(runTimeArray))
+
+        print('Maze 1 Navigation Distance (m)')
+        print('Mean: ', np.average(navDistanceArray))
+        print('Standard Deviation: ', np.std(navDistanceArray))
+        print('Max: ', max(navDistanceArray))
+        print('Min: ', min(navDistanceArray))
+
+        print('Maze 1 Locomotion Error (m)')
+        print('Mean: ', np.average(locomotionErrorArray))
+        print('Standard Deviation: ', np.std(locomotionErrorArray))
+        print('Max: ', max(locomotionErrorArray))
+        print('Min: ', min(locomotionErrorArray))
+
     else:
         print('All runs failed for this maze')
 
+    print('Start Point X Values: ', startXValues)
+    print('End Point X Values: ', endXValues)
+    '''
     runTimeList = []
     navDistanceList = []
     locomotionErrorList = []
@@ -334,12 +361,34 @@ elif (mode == 's'):
         rospy.sleep(5)
 
     if (len(runTimeList) != 0):
-        print('Maze 2 Mean Navigation Time (s): ', sum(runTimeList)/len(runTimeList))
-        print('Maze 2 Mean Navigation Distance (m): ', sum(navDistanceList)/len(navDistanceList))
-        print('Maze 2 Mean Locomotion Error (m): ', sum(locomotionErrorList)/len(locomotionErrorList))
+        runTimeArray = np.array(runTimeList)
+        navDistanceArray = np.array(navDistanceList)
+        locomotionErrorArray = np.array(locomotionErrorList)
+
+        print('Maze 2 Navigation Time (s)')
+        print('Mean: ', np.average(runTimeArray))
+        print('Standard Deviation: ', np.std(runTimeArray))
+        print('Max: ', max(runTimeArray))
+        print('Min: ', min(runTimeArray))
+
+        print('Maze 2 Navigation Distance (m)')
+        print('Mean: ', np.average(navDistanceArray))
+        print('Standard Deviation: ', np.std(navDistanceArray))
+        print('Max: ', max(navDistanceArray))
+        print('Min: ', min(navDistanceArray))
+        
+        print('Maze 2 Locomotion Error (m)')
+        print('Mean: ', np.average(locomotionErrorArray))
+        print('Standard Deviation: ', np.std(locomotionErrorArray))
+        print('Max: ', max(locomotionErrorArray))
+        print('Min: ', min(locomotionErrorArray))
+
     else:
         print('All runs failed for this maze')
-
+    
+    print('Start Point X Values: ', startXValues)
+    print('End Point X Values: ', endXValues)
+    '''
     runTimeList = []
     navDistanceList = []
     locomotionErrorList = []
@@ -400,12 +449,34 @@ elif (mode == 's'):
         rospy.sleep(5)
 
     if (len(runTimeList) != 0):
-        print('Maze 3 Mean Navigation Time (s): ', sum(runTimeList)/len(runTimeList))
-        print('Maze 3 Mean Navigation Distance (m): ', sum(navDistanceList)/len(navDistanceList))
-        print('Maze 3 Mean Locomotion Error (m): ', sum(locomotionErrorList)/len(locomotionErrorList))
+        runTimeArray = np.array(runTimeList)
+        navDistanceArray = np.array(navDistanceList)
+        locomotionErrorArray = np.array(locomotionErrorList)
+        
+        print('Maze 3 Navigation Time (s)')
+        print('Mean: ', np.average(runTimeArray))
+        print('Standard Deviation: ', np.std(runTimeArray))
+        print('Max: ', max(runTimeArray))
+        print('Min: ', min(runTimeArray))
+
+        print('Maze 3 Navigation Distance (m)')
+        print('Mean: ', np.average(navDistanceArray))
+        print('Standard Deviation: ', np.std(navDistanceArray))
+        print('Max: ', max(navDistanceArray))
+        print('Min: ', min(navDistanceArray))
+        
+        print('Maze 3 Locomotion Error (m)')
+        print('Mean: ', np.average(locomotionErrorArray))
+        print('Standard Deviation: ', np.std(locomotionErrorArray))
+        print('Max: ', max(locomotionErrorArray))
+        print('Min: ', min(locomotionErrorArray))
+
     else:
         print('All runs failed for this maze')
+    
+    print('Start Point X Values: ', startXValues)
+    print('End Point X Values: ', endXValues)
 
     print('Success Rate: ', float(successSims) / totalSims)
-
+    '''
 
